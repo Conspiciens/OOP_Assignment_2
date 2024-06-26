@@ -5,7 +5,6 @@ public interface UserGroup {
     public void display(); 
 }
 
-/* @TODO: make public both classes */
 class GroupList implements UserGroup {
    private List<Group> Groups = new ArrayList<Group>();
 

@@ -12,13 +12,16 @@ class AdminView extends JFrame implements ActionListener {
     private List<JTextField> textFields = new ArrayList<JTextField>(); 
     private JTextArea textArea = new JTextArea(); 
 
+    /* Admin ptr */
     private static AdminView ptr;  
 
     int studentCount = 0; 
 
+    /* Init GroupList and Group */
     GroupList groupManagement = new GroupList(); 
     Group rootGroup = new Group("Root", "1");
 
+    /* Manage Singleton of Admin View */
     public static synchronized AdminView getInstance(){
         if (ptr == null){
             ptr = new AdminView();
@@ -29,6 +32,7 @@ class AdminView extends JFrame implements ActionListener {
 
     private AdminView() {}
 
+    /* Render all the Admin View Information */
     public void render () {
         this.groupManagement.addGroup(this.rootGroup);
 
@@ -116,21 +120,26 @@ class AdminView extends JFrame implements ActionListener {
         this.mainWindow.setVisible(true);
     }
 
+    /* Set Default Text */
     public void setDefaultText(){
         this.textArea.setText("Tree View \n");
     }
 
+    /* Whenever Buttons are clicked managed actions */
     @Override
     public void actionPerformed(ActionEvent e) {
         String textFieldInfo; 
         String studentName; 
         String tabSpace = " ";
 
+        /* Set up Visitors */
         Visitor visitor = new visitImpl();
+        /* Set up Frame For User */
         JFrame miniFrame = new JFrame();
         miniFrame.setBounds(0, 0, 1000, 1000);
         JLabel label = new JLabel();
 
+        /* Switch through the Buttons when clicked */
         switch (e.getActionCommand()){
             case "Add User": 
                 String groupForUser = this.textArea.getSelectedText();
@@ -138,6 +147,7 @@ class AdminView extends JFrame implements ActionListener {
                 studentName = "stu" + String.valueOf(studentCount);  
                 textFieldInfo = this.textFields.get(0).getText();
 
+                /* Check if Group is selected otherwise add new user to Root Group */
                 User newUser = new User(textFieldInfo, studentName); 
                 if (groupForUser == null){
                     this.rootGroup.addUser(newUser);
@@ -149,6 +159,7 @@ class AdminView extends JFrame implements ActionListener {
                     }
                 }
 
+                /* Init the Group to add the new User to the TextArea */
                 this.setDefaultText();
                 for (Group singleGroup : this.groupManagement.getAllGroups()){
                     this.textArea.append(tabSpace + "" + singleGroup.getGroupName() + "\n"); 
@@ -162,12 +173,14 @@ class AdminView extends JFrame implements ActionListener {
                 this.studentCount++; 
                 break;
             case "Add Group": 
+                /* Grab the ID of the Group and create it */
                 String groupName = "group" + studentCount; 
                 textFieldInfo = this.textFields.get(0).getText(); 
 
                 Group newGroup = new Group(groupName, textFieldInfo);
                 this.groupManagement.addGroup(newGroup);
 
+                /* Init the Text Area to add the Group */
                 this.setDefaultText();
                 for (Group group: this.groupManagement.getAllGroups()){
                     this.textArea.append(tabSpace + "" + group.getGroupName() + "\n"); 
@@ -182,6 +195,7 @@ class AdminView extends JFrame implements ActionListener {
             case "Open User View": 
                 String userText = this.textArea.getSelectedText();
 
+                /* If user is equal to the userText then init a UserView */
                 for (Group group : this.groupManagement.getAllGroups()){
                     for (User user : group.getUsers()){
                         if (user.getName().equals(userText)){
@@ -194,6 +208,7 @@ class AdminView extends JFrame implements ActionListener {
 
             case "Show Group Total": 
                 int totalGroup = 0; 
+                /* Visit all the groups and return the total count Group */
                 for (Group group : this.groupManagement.getAllGroups()){
                     totalGroup = visitor.accept(group);
                 }
@@ -204,6 +219,7 @@ class AdminView extends JFrame implements ActionListener {
                 break;
             case "Show User Total": 
                 int totalUser = 0; 
+                /* Visit all the users and return the total count Users */
                 for (Group group : this.groupManagement.getAllGroups()){
                     for (User user : group.getUsers()){
                         totalUser = visitor.accept(user);
@@ -218,6 +234,7 @@ class AdminView extends JFrame implements ActionListener {
 
             case "Show Messages Total": 
                 int totalMessages = 0; 
+                /* Visit all the users and get all the total Tweets */
                 for (Group group : this.groupManagement.getAllGroups()){
                     for (User user : group.getUsers()){
                         totalMessages = visitor.acceptTweets(user);
@@ -233,6 +250,7 @@ class AdminView extends JFrame implements ActionListener {
                 int totalPositiveTweets = 0; 
                 int totalTweets = 0; 
 
+                /* Get all the acceptTweets considered positive and total Tweets and return the percentage positive */
                 for (Group group: this.groupManagement.getAllGroups()){
                     for (User user : group.getUsers()){
                         totalPositiveTweets = visitor.acceptTweetsPosPer(user); 
@@ -269,15 +287,18 @@ class UserView extends JFrame implements ActionListener {
         this.user = user; 
         this.groupManagement = groupManagement; 
 
+        /* Init the oberservers */
         follow.addObserver(new ListView(this));
         tweet.addObserver(new ListView(this));
 
+        /* Init the main Window */
         this.mainWindow.setBounds(0, 0, 1000, 1000);
 
         this.mainWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.container = this.mainWindow.getContentPane();
         this.container.setLayout(null);
 
+        /* Init the structure of the User Window */
         JButton followButton = new JButton(); 
         followButton.setBounds(500, 0, 500, 100);
         followButton.setText("Follow User");
@@ -327,9 +348,9 @@ class UserView extends JFrame implements ActionListener {
             case "Follow User": 
                 String followID = this.textFields.get(0).getText(); 
 
+                /* Observer that updates the Follow user */
                 for (Group singleGroup : this.groupManagement.getAllGroups()){
                     for (User singleUser : singleGroup.getUsers()) {
-                        System.out.println(singleUser.getName());
                         if (singleUser.getID().equals(followID)){
                             follow.followerUser(singleUser);
                         }
@@ -337,6 +358,7 @@ class UserView extends JFrame implements ActionListener {
                 }
                 break;
             case "Post Button": 
+                /* Observer that updates the post tweets */
                 String message = this.textFields.get(1).getText();
 
                 System.out.println(message);

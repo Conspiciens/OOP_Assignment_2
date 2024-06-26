@@ -38,6 +38,7 @@ class visitImpl implements Visitor {
 
     @Override 
     public int acceptTweetsPosPer(User user){
+        /* Check if the tweet contains a positive message */
         for (String tweet : user.getTweets()){ 
             for (String posMes : positiveMessages){
                 if (tweet.contains(posMes)){
