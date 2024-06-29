@@ -33,17 +33,28 @@ class GroupList implements UserGroup {
 class Group implements UserGroup {
     private String name; 
     private String ID; 
+    private TimeDecorator creation; 
     private List<User> Users = new ArrayList<User>(); 
 
-    public Group(String name, String ID){
+    public Group(String name, String ID, long creationTime){
         this.name = name; 
         this.ID = ID; 
+        this.creation = new TimeDecorator(creationTime);
     }
 
     public void addUser(User user){
         if (Users.contains(user))
             return; 
         Users.add(user);
+    }
+
+    public void setCreationTime(long creationTime){
+        creation.setCreationTime(creationTime);
+    }
+
+    public void printCreationTime() {
+        System.out.print(name + ": ");
+        creation.getCreationTime();
     }
 
     public List<User> getUsers() {

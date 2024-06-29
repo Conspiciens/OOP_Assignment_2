@@ -20,13 +20,28 @@ public class ListView implements Observer {
             /* Append all the Users tweets that the user follows */
             for (User eachUser : listToRender) {
                 for (String eachTweet : eachUser.getTweets()) {        
-                    this.userView.getTextAreas().get(1).append(eachUser.getName() + ": " + eachTweet + "\n");
+                    this.userView.getTextAreas().get(1)
+                        .append(eachUser.getName() + ": " + eachTweet + "\n");
+
+                    /* Update lastUpdateTime here using update or setter */
+                    eachUser.setUpdateTime(System.currentTimeMillis());
+
+                    /* Print out update time for user */
+                    System.out.print(eachUser.getName() + ": ");
+                    System.out.println(eachUser.getUpdateTime());
                 } 
             }
         } else {
             /* Append Tweets that User follows */
             this.userView.getTextAreas().get(1).append(
                 listToRender.get(finalIndex).getName() + ": " + messages.get(messages.size() - 1) + "\n");
+
+            /* Update lastUpdateTime here using update or setter */
+            listToRender.get(finalIndex).setUpdateTime(System.currentTimeMillis());
+
+            /* Print out the update time for user */
+            System.out.print(listToRender.get(finalIndex).getName() + ": "); 
+            System.out.println(listToRender.get(finalIndex).getUpdateTime());
         }
 
     }

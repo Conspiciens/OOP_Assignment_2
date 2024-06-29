@@ -19,7 +19,7 @@ class AdminView extends JFrame implements ActionListener {
 
     /* Init GroupList and Group */
     GroupList groupManagement = new GroupList(); 
-    Group rootGroup = new Group("Root", "1");
+    Group rootGroup = new Group("Root", "1", System.currentTimeMillis());
 
     /* Manage Singleton of Admin View */
     public static synchronized AdminView getInstance(){
@@ -106,6 +106,18 @@ class AdminView extends JFrame implements ActionListener {
         showPosPerMessages.addActionListener(this);
         this.container.add(showPosPerMessages);
 
+        JButton checkUserValid = new JButton(); 
+        checkUserValid.setBounds(750, 600, 200, 100);
+        checkUserValid.setText("Check Valid");
+        checkUserValid.addActionListener(this);
+        this.container.add(checkUserValid);
+
+        JButton lastUpdatedUser = new JButton(); 
+        lastUpdatedUser.setBounds(600, 600, 200, 100);
+        lastUpdatedUser.setText("Last Update"); 
+        lastUpdatedUser.addActionListener(this);
+        this.container.add(lastUpdatedUser);
+
         this.setDefaultText();
         String tabSpace = "";
         for (Group group: this.groupManagement.getAllGroups()){
@@ -141,35 +153,18 @@ class AdminView extends JFrame implements ActionListener {
 
         /* Switch through the Buttons when clicked */
         switch (e.getActionCommand()){
-            case "Add User": 
+            case "Add User":
                 String groupForUser = this.textArea.getSelectedText();
 
                 studentName = "stu" + String.valueOf(studentCount);  
                 textFieldInfo = this.textFields.get(0).getText();
 
+                User newUser = new User(textFieldInfo, 
+                    studentName, System.currentTimeMillis()); 
+                AddStudent addStudent = new AddStudent(this.rootGroup, this.groupManagement, 
+                    newUser, groupForUser, this.textArea);  
                 /* Check if Group is selected otherwise add new user to Root Group */
-                User newUser = new User(textFieldInfo, studentName); 
-                if (groupForUser == null){
-                    this.rootGroup.addUser(newUser);
-                } else {
-                    for (Group group : this.groupManagement.getAllGroups()){
-                        if (group.getGroupName().equals(groupForUser)){
-                            group.addUser(newUser);
-                        }
-                    }
-                }
-
-                /* Init the Group to add the new User to the TextArea */
-                this.setDefaultText();
-                for (Group singleGroup : this.groupManagement.getAllGroups()){
-                    this.textArea.append(tabSpace + "" + singleGroup.getGroupName() + "\n"); 
-                    tabSpace += " "; 
-                    for (User singleUser : singleGroup.getUsers()){
-                        this.textArea.append(tabSpace + "- " + singleUser.getName() + "\n");
-                    }
-                    tabSpace += " ";
-                }
-                
+                addStudent.execute(); 
                 this.studentCount++; 
                 break;
             case "Add Group": 
@@ -177,7 +172,8 @@ class AdminView extends JFrame implements ActionListener {
                 String groupName = "group" + studentCount; 
                 textFieldInfo = this.textFields.get(0).getText(); 
 
-                Group newGroup = new Group(groupName, textFieldInfo);
+                Group newGroup = new Group(groupName, textFieldInfo, 
+                    System.currentTimeMillis());
                 this.groupManagement.addGroup(newGroup);
 
                 /* Init the Text Area to add the Group */
@@ -200,6 +196,7 @@ class AdminView extends JFrame implements ActionListener {
                     for (User user : group.getUsers()){
                         if (user.getName().equals(userText)){
                             new UserView(user, this.groupManagement); 
+                            user.displayCreationTime();
                         }
                     }
                 }
@@ -267,6 +264,26 @@ class AdminView extends JFrame implements ActionListener {
                 miniFrame.add(label); 
                 miniFrame.setVisible(true);
                 break; 
+
+            case "Check Valid": 
+                CheckValid validation = new CheckValid(this.groupManagement);
+                validation.execute();
+
+                break; 
+
+            case "Last Update":
+                long updateTime = 000000; 
+
+                for (Group group : this.groupManagement.getAllGroups()){
+                    for (User user : group.getUsers()){
+                        if (user.getUpdateTime() > updateTime){
+                            updateTime = user.getUpdateTime();
+                        }
+                    }
+                }
+
+                System.out.println("Last Update: " + updateTime); 
+                break;
         }
     }
 }
